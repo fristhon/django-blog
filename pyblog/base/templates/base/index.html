@@ -1,5 +1,37 @@
 {% extends "./base.html" %}
 
 {% block content %}
-Welcome to my blog
+
+<br>
+<br>
+
+
+<div class="container">
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+        {% for post in posts%}
+
+        <div class="col">
+            <div class="card shadow-sm">
+                <img height="200px"
+                src="{{post.image.url}}">
+                <p class="text-center fw-bold">{{post.title}}</p>
+                <div class="card-body">
+                    <p class="card-text">{{post.intro}}</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-sm btn-outline-secondary">read more</button>
+                        </div>
+                        <small class="text-muted">{{post.publish_date|date}}</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        
+        {% endfor %}
+
+
+    </div>
+</div>
+
 {% endblock %}
