@@ -14,12 +14,13 @@
             <div class="card shadow-sm">
                 <img height="200px"
                 src="{{post.image.url}}">
+                {% comment %} <a href="{{post.url}}" class="text-center" style="text-decoration:none">{{post.title}}</a> {% endcomment %}
                 <p class="text-center fw-bold">{{post.title}}</p>
                 <div class="card-body">
                     <p class="card-text">{{post.intro}}</p>
                     <div class="d-flex justify-content-between align-items-center">
                         <div class="btn-group">
-                            <button type="button" class="btn btn-sm btn-outline-secondary">read more</button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary"><a href="{% url 'post' post.slug %}" style="text-decoration:none">read more</a></button>
                         </div>
                         <small class="text-muted">{{post.publish_date|date}}</small>
                     </div>
