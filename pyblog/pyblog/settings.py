@@ -10,17 +10,15 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
+import json
 from pathlib import Path
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+with open(BASE_DIR / 'pyblog' / 'secret.json','r',encoding='utf-8') as secret_file:
+    secret = json.load(secret_file)
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-a3d$%hu5qdbndb8oj$vr41g88y49hj*%h=hfgqnh_b0a+kid=e'
+SECRET_KEY = secret['SECRET_KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -121,6 +119,12 @@ USE_TZ = True
 STATIC_URL = 'static/'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+EMAIL_USE_TLS = True  
+EMAIL_HOST = 'smtp.outlook.com'
+EMAIL_HOST_USER = secret['EMAIL_HOST_USER']
+EMAIL_HOST_PASSWORD = secret['EMAIL_HOST_PASSWORD']
+EMAIL_PORT = 587  
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field

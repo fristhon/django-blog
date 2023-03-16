@@ -1,0 +1,8 @@
+{% autoescape off %}  
+Hi {{ user.username }},  
+
+Congratulations!
+You've signed up for the best educational blog in the world! Please confirm your email address to confirm your registration.
+
+http://{{ domain }}{% url 'activate' uidb64=uid token=token %}  
+{% endautoescape %}  
