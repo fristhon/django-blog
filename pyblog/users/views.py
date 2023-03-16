@@ -53,7 +53,7 @@ def activate(request, uidb64, token):
 	if user is not None and is_token_valid(user, token):  
 		user.is_active = True  
 		user.save()  
-		return HttpResponseRedirect('login')  
+		return HttpResponseRedirect('/')  
 	return HttpResponse('Activation link is invalid!') 
 
 def password_reset(request):
