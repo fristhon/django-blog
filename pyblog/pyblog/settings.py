@@ -11,13 +11,18 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
 import json
+import sys
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-with open(BASE_DIR / 'pyblog' / 'secret.json','r',encoding='utf-8') as secret_file:
-    secret = json.load(secret_file)
-
+try:
+    with open(BASE_DIR / 'pyblog' / 'secret.json','r',encoding='utf-8') as secret_file:
+        secret = json.load(secret_file)
+except FileNotFoundError:
+    sys.stderr.write("Fill the secret json file with real values before run, use the sample")
+    sys.exit(1)
+    
 SECRET_KEY = secret['SECRET_KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
