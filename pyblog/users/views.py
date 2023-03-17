@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponseRedirect,HttpResponse
 from django.contrib import auth
-from django.contrib.auth.models import User  
+from django.contrib.auth import get_user_model
 from django.db.models import Q
 from django.contrib import messages
 from .forms import UserRegistrationForm,UserSetPasswordForm,UserPasswordResetForm
@@ -15,6 +15,8 @@ from .values import INVALID_ACTIVATION_LINK_MSG
 from .values import EMAIL_PASSWORD_RESET_MSG
 from .values import PASSWORD_CHANGE_MSG
 from .values import INVALID_PASSWORD_RESET_LINK_MSG
+
+User = get_user_model()
 
 def register(request):
 	if request.user.is_authenticated:
