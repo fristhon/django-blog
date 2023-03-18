@@ -12,16 +12,14 @@
 
         <div class="col">
             <div class="card shadow-sm">
-                <img height="200px"
-                src="{{post.image.url}}">
-                {% comment %} <a href="{{post.url}}" class="text-center" style="text-decoration:none">{{post.title}}</a> {% endcomment %}
-                <p class="text-center fw-bold">{{post.title}}</p>
+                <img height="200px" src="{{post.image.url}}">
+                <a class="text-center" style="text-decoration:none" href="{% url 'post' post.slug %}" style="text-decoration:none">{{post.title}}</a>
                 <div class="card-body">
                     <p class="card-text">{{post.intro}}</p>
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div class="btn-group">
-                            <button type="button" class="btn btn-sm btn-outline-secondary"><a href="{% url 'post' post.slug %}" style="text-decoration:none">read more</a></button>
-                        </div>
+                    <div>
+                        {% if post.vip %}
+                        <i class="bi bi-star-fill"></i>
+                        {% endif %}
                         <small class="text-muted">{{post.publish_date|date}}</small>
                     </div>
                 </div>

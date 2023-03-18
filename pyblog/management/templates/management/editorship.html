@@ -1,0 +1,110 @@
+{% extends "base/base.html" %}
+
+{% load filters %}
+
+
+{% block content %}
+
+
+<br>
+<br>
+<h1>Publish a new post:</h1>
+<br>
+
+<div class="container">
+    <form method="post" enctype="multipart/form-data" name="publish">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" name="publish">Publish</button>
+    </form>
+
+</div>
+
+
+<br>
+<br>
+<h1>Manage Posts:</h1>
+<br>
+<br>
+
+<div class="container">
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+        {% for post in posts%}
+
+        <div class="col">
+            <div class="card shadow-sm">
+                <img height="200px" src={{post.image.url}}>
+                <p class="text-center fw-bold">{{post.title}}</p>
+                <p class="text-center fw-bold">{{post.publish_date}}</p>
+                {% if post.vip == True %}
+                <i class="text-center fw-bold">VIP</i>
+                {% else %}
+                <i class="text-center fw-bold">Free</i>
+                {% endif %}
+
+                <form method="post">
+                    {% csrf_token %}
+                    <label for="fname">VIP:</label>
+                        {% if post.vip == True %}
+                        <input type="hidden" name="editpost" value="{{post.id}}">
+                        <input type="checkbox" name="editpost" value="{{post.id}}" checked="true" onChange="this.form.submit()">    
+                        {% else %}
+                        <input type="checkbox" name="editpost" value="{{post.id}}" onChange="this.form.submit()">    
+                        {% endif %}
+                </form>
+
+            </div>
+        </div>
+
+
+
+        {% endfor %}
+    </div>
+</div>
+
+
+
+<br>
+<br>
+<h1>Manage Users:</h1>
+<br>
+<br>
+
+<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+    {% for user in users%}
+
+    <div class="col">
+        <div class="card shadow-sm">
+            <p class="text-center fw-bold">{{user.username}}</p>
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="btn-group">
+                        Is Staff:<span class="text-muted">{{user.is_staff}}</span>
+                    </div>
+                    <small class="text-muted">{{user.email}}</small>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        <label for="fname">Subscriber:</label>
+                        {% if request.user|is_subscriber:user.id %}
+                            <input type="hidden" name="edituser" value="{{user.id}}">
+                            <input type="checkbox" name="edituser" value="{{user.id}}" checked="true" onChange="this.form.submit()">    
+                            {% else %}
+                            <input type="checkbox" name="edituser" value="{{user.id}}" onChange="this.form.submit()">    
+                            {% endif %}
+                    </form>
+
+
+
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    {% endfor %}
+</div>
+
+
+{% endblock %}

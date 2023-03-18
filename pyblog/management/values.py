@@ -1,0 +1,1 @@
+EDITORSHIP_ACCESS_MSG = 'Only moderators and staff members can access to this page'
