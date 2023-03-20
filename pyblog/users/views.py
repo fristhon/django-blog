@@ -4,6 +4,7 @@ from django.contrib import auth
 from django.contrib.auth import get_user_model
 from django.db.models import Q
 from django.contrib import messages
+from django.conf import settings
 from .forms import UserRegistrationForm,UserSetPasswordForm,UserPasswordResetForm
 from .helpers import is_token_valid,send_mail,user_from_uidb64
 from .values import EMAIL_CONFIRM_MSG
@@ -116,3 +117,60 @@ def password_reset_confirm(request, uidb64, token):
 	else:
 		messages.error(request, INVALID_PASSWORD_RESET_LINK_MSG)
 		return HttpResponseRedirect("/")
+	
+import requests
+import json
+from django.contrib.sites.shortcuts import get_current_site
+def payment(request):
+	url = "https://api-sandbox.nowpayments.io/v1/invoice"
+	
+	protocol = 'https' if request.is_secure() else 'http'  
+	domain = get_current_site(request).domain
+	base_url = f"{protocol}://{domain}"
+	payload = json.dumps({
+	"price_amount": 0.1,
+	"price_currency": "usd",
+	"pay_currency ": "trx",
+	"order_id": f"sub-u{request.user.id}",
+	"order_description": "basic membership",
+	"ipn_callback_url": f"{base_url}users/payment_listner/",
+	"success_url": f"{base_url}users/profile/",
+	"cancel_url": f"{base_url}"
+	})
+	headers = {
+	'x-api-key': settings.NOWPAYMENTS_API_KEY,
+	'Content-Type': 'application/json'
+	}
+
+	response = requests.post(url, headers=headers, data=payload)
+	invoice_url = response.json()['invoice_url']
+	return HttpResponseRedirect(invoice_url)
+
+
+
+import hashlib
+import hmac
+def is_payment_valid(request_body : dict,payment_signature : str) -> bool:
+	sorted_dict = dict(sorted(request_body.items()))
+	#python doc:To get the most compact JSON representation
+	#you should specify (',', ':') to eliminate whitespace
+	#ignoring spaces is necessery for making a correct hash
+	message = json.dumps(sorted_dict,separators=(',', ':'))
+	calculated_signature = hmac.new(settings.NOWPAYMENTS_IPN_KEY.encode(), message.encode(), hashlib.sha512).digest().hex()
+	return payment_signature == calculated_signature
+
+from django.contrib.auth.models import Group
+def payment_listner(request):
+	msg = f"{request.POST = }"
+	print(msg)
+	print(request.body)
+	print(request.headers)
+	if is_payment_valid(json.loads(request.body),request.headers['x-nowpayments-sig']):
+		print("valid payment, add user to subscriber groups")
+		group_name = 'Subscriber'
+		group = Group.objects.get(name=group_name) 
+		request.user.groups.add(group)
+	else:
+		print("signature not match")
+	
+	return HttpResponse(msg)

@@ -134,6 +134,9 @@ EMAIL_PORT = 587
 
 AUTH_USER_MODEL = "users.CustomUser"
 
+NOWPAYMENTS_API_KEY = secret['NOWPAYMENTS_API_KEY']
+NOWPAYMENTS_IPN_KEY = secret['NOWPAYMENTS_IPN_KEY']
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 

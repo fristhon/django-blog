@@ -1,10 +1,21 @@
 {% extends "base/base.html" %}
+{% load base_filters %}
 
 {% block content %}
 
 <div class="container my-5">
 
     <h1>Welcome {{user.username}}</h1>
+
+    {% if user|is_subscriber:user.id %}
+    <h3>Congratulations! You are a subscriber</h3>
+    {% else %}
+    <div class="btn-group">
+        <button type="button" class="btn btn-warning btn-lg text-wrap px-5 mt-2 w-100"><a href="{% url 'payment' %}"
+                class="text-white" style="text-decoration:none">Buy Membership</a></button>
+    </div>
+    {% endif %}
+
     <div class="btn-group">
         <button type="button" class="btn btn-danger btn-lg text-wrap px-5 mt-2 w-100"><a href="{% url 'logout' %}"
                 class="text-white" style="text-decoration:none">Log out</a></button>
