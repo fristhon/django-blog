@@ -133,8 +133,8 @@ def payment(request):
 	"pay_currency": "trx",
 	"order_id": f"sub-u{request.user.id}",
 	"order_description": "basic membership",
-	"ipn_callback_url": f"{base_url}/users/payment_listner/",
-	"success_url": f"{base_url}/users/profile/",
+	"ipn_callback_url": f"{base_url}/users/payment_listner",
+	"success_url": f"{base_url}/users/profile",
 	"cancel_url": f"{base_url}"
 	})
 	headers = {
@@ -166,11 +166,14 @@ def payment_listner(request):
 	print(msg)
 	print(request.body)
 	print(request.headers)
-	if is_payment_valid(json.loads(request.body),request.headers['x-nowpayments-sig']):
-		print("valid payment, add user to subscriber groups")
+	request_body = json.loads(request.body)
+	if is_payment_valid(request_body,request.headers['x-nowpayments-sig']):
 		group_name = 'Subscriber'
 		group = Group.objects.get(name=group_name) 
-		request.user.groups.add(group)
+		user_id = int(request_body['order_id'].split("-")[-1])
+		user = User.objects.get(pk=user_id)
+		user.groups.add(group)
+		print("valid payment, add user to subscriber groups ",user)
 	else:
 		print("signature not match")
 	
