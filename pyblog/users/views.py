@@ -1,4 +1,8 @@
+import requests
+import json
 from django.shortcuts import render
+from django.contrib.auth.models import Group
+from django.contrib.sites.shortcuts import get_current_site
 from django.http import HttpResponseRedirect,HttpResponse
 from django.contrib import auth
 from django.contrib.auth import get_user_model
@@ -6,7 +10,7 @@ from django.db.models import Q
 from django.contrib import messages
 from django.conf import settings
 from .forms import UserRegistrationForm,UserSetPasswordForm,UserPasswordResetForm
-from .helpers import is_token_valid,send_mail,user_from_uidb64
+from .helpers import is_token_valid,send_mail,user_from_uidb64,is_payment_valid
 from .values import EMAIL_CONFIRM_MSG
 from .values import EMAIL_PROBLEM_MSG
 from .values import LOGIN_MSG
@@ -16,6 +20,7 @@ from .values import INVALID_ACTIVATION_LINK_MSG
 from .values import EMAIL_PASSWORD_RESET_MSG
 from .values import PASSWORD_CHANGE_MSG
 from .values import INVALID_PASSWORD_RESET_LINK_MSG
+from .values import PAYMENT_SUCCESS_MSG
 
 User = get_user_model()
 
@@ -59,9 +64,17 @@ def login(request):
 	return render(request, 'users/login.html', {'form':form, 'title':'log in'})
 
 def profile(request):
+	force_sub = False
 	if not request.user.is_authenticated:
 		return HttpResponseRedirect('login')
-	return render(request, 'users/profile.html', {})
+	if 'NP_id' in request.GET.urlencode():
+		messages.success(request,PAYMENT_SUCCESS_MSG)
+		force_sub = True
+	
+	#TODO
+	#force_sub is a bad trick to update template state
+	#it should be handle in a better way
+	return render(request, 'users/profile.html', {'force_sub':force_sub})
 
 def logout(request):
 	auth.logout(request)
@@ -118,9 +131,7 @@ def password_reset_confirm(request, uidb64, token):
 		messages.error(request, INVALID_PASSWORD_RESET_LINK_MSG)
 		return HttpResponseRedirect("/")
 	
-import requests
-import json
-from django.contrib.sites.shortcuts import get_current_site
+
 def payment(request):
 	url = "https://api-sandbox.nowpayments.io/v1/invoice"
 	
@@ -131,7 +142,7 @@ def payment(request):
 	"price_amount": 0.1,
 	"price_currency": "usd",
 	"pay_currency": "trx",
-	"order_id": f"sub-u{request.user.id}",
+	"order_id": f"subu-{request.user.id}",
 	"order_description": "basic membership",
 	"ipn_callback_url": f"{base_url}/users/payment_listner",
 	"success_url": f"{base_url}/users/profile",
@@ -142,39 +153,17 @@ def payment(request):
 	'Content-Type': 'application/json'
 	}
 
-	print(payload)
 	response = requests.post(url, headers=headers, data=payload)
 	invoice_url = response.json()['invoice_url']
 	return HttpResponseRedirect(invoice_url)
 
-
-
-import hashlib
-import hmac
-def is_payment_valid(request_body : dict,payment_signature : str) -> bool:
-	sorted_dict = dict(sorted(request_body.items()))
-	#python doc:To get the most compact JSON representation
-	#you should specify (',', ':') to eliminate whitespace
-	#ignoring spaces is necessery for making a correct hash
-	message = json.dumps(sorted_dict,separators=(',', ':'))
-	calculated_signature = hmac.new(settings.NOWPAYMENTS_IPN_KEY.encode(), message.encode(), hashlib.sha512).digest().hex()
-	return payment_signature == calculated_signature
-
-from django.contrib.auth.models import Group
 def payment_listner(request):
-	msg = f"{request.POST = }"
-	print(msg)
-	print(request.body)
-	print(request.headers)
 	request_body = json.loads(request.body)
 	if is_payment_valid(request_body,request.headers['x-nowpayments-sig']):
-		group_name = 'Subscriber'
-		group = Group.objects.get(name=group_name) 
+		group = Group.objects.get(name='Subscriber') 
 		user_id = int(request_body['order_id'].split("-")[-1])
 		user = User.objects.get(pk=user_id)
 		user.groups.add(group)
-		print("valid payment, add user to subscriber groups ",user)
-	else:
-		print("signature not match")
-	
-	return HttpResponse(msg)
+		return HttpResponse("Ok")
+	#TODO
+	return HttpResponse("400")

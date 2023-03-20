@@ -19,3 +19,5 @@ EMAIL_PASSWORD_RESET_MSG = """
 """
 PASSWORD_CHANGE_MSG = 'Your password has been set. You may go ahead and <b>log in </b> now.'
 INVALID_PASSWORD_RESET_LINK_MSG = 'Password reset link is expired'
+
+PAYMENT_SUCCESS_MSG = 'Thanks for buying the blog membership, you are a VIP posts Subscriber now!'

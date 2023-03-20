@@ -7,7 +7,7 @@
 
     <h1>Welcome {{user.username}}</h1>
 
-    {% if user|is_subscriber:user.id %}
+    {% if force_sub or user|is_subscriber:user.id %}
     <h3>Congratulations! You are a subscriber</h3>
     {% else %}
     <div class="btn-group">

@@ -1,12 +1,14 @@
+import hashlib
+import hmac
+import json
+import six
 from django.contrib.sites.shortcuts import get_current_site  
 from django.utils.encoding import force_bytes,force_str  
 from django.utils.http import urlsafe_base64_encode,urlsafe_base64_decode
 from django.template.loader import render_to_string  
 from django.core.mail import EmailMessage
 from django.conf import settings
-
 from django.contrib.auth.tokens import PasswordResetTokenGenerator  
-import six
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
@@ -42,3 +44,12 @@ def send_mail(request,user,*,template,subject,reciver):
 			subject, message,from_email=settings.EMAIL_HOST_USER, to=[reciver]  
 	)  
 	return email.send()
+
+def is_payment_valid(request_body : dict,payment_signature : str) -> bool:
+	sorted_dict = dict(sorted(request_body.items()))
+	#ignoring spaces is necessery for making a correct hash
+	#python doc:To get the most compact JSON representation
+	#you should specify (',', ':') to eliminate whitespace
+	message = json.dumps(sorted_dict,separators=(',', ':'))
+	calculated_signature = hmac.new(settings.NOWPAYMENTS_IPN_KEY.encode(), message.encode(), hashlib.sha512).digest().hex()
+	return payment_signature == calculated_signature
