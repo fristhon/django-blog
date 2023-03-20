@@ -130,7 +130,7 @@ def payment(request):
 	payload = json.dumps({
 	"price_amount": 0.1,
 	"price_currency": "usd",
-	"pay_currency ": "trx",
+	"pay_currency": "trx",
 	"order_id": f"sub-u{request.user.id}",
 	"order_description": "basic membership",
 	"ipn_callback_url": f"{base_url}users/payment_listner/",
