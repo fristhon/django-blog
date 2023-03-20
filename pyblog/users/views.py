@@ -133,8 +133,8 @@ def payment(request):
 	"pay_currency": "trx",
 	"order_id": f"sub-u{request.user.id}",
 	"order_description": "basic membership",
-	"ipn_callback_url": f"{base_url}users/payment_listner/",
-	"success_url": f"{base_url}users/profile/",
+	"ipn_callback_url": f"{base_url}/users/payment_listner/",
+	"success_url": f"{base_url}/users/profile/",
 	"cancel_url": f"{base_url}"
 	})
 	headers = {
@@ -142,6 +142,7 @@ def payment(request):
 	'Content-Type': 'application/json'
 	}
 
+	print(payload)
 	response = requests.post(url, headers=headers, data=payload)
 	invoice_url = response.json()['invoice_url']
 	return HttpResponseRedirect(invoice_url)
