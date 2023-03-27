@@ -137,6 +137,10 @@ AUTH_USER_MODEL = "users.CustomUser"
 NOWPAYMENTS_API_KEY = secret['NOWPAYMENTS_API_KEY']
 NOWPAYMENTS_IPN_KEY = secret['NOWPAYMENTS_IPN_KEY']
 
+SUPERUSER_USERNAME = secret['SUPERUSER_USERNAME']
+SUPERUSER_EMAIL = secret['SUPERUSER_EMAIL']
+SUPERUSER_PASSWORD = secret['SUPERUSER_PASSWORD']
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
