@@ -9,7 +9,7 @@ COPY . .
 
 EXPOSE 8000
 
-RUN pyblog/manage.py migrate
-RUN pyblog/manage.py initsuperuser
-ENTRYPOINT ["python", "pyblog/manage.py"]
+RUN python3.9 pyblog/manage.py migrate
+RUN python3.9 pyblog/manage.py initsuperuser
+ENTRYPOINT ["python3.9", "pyblog/manage.py"]
 CMD ["runserver", "0.0.0.0:8000"]
