@@ -17,7 +17,7 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 try:
-    with open(BASE_DIR / 'pyblog' / 'secret.json','r',encoding='utf-8') as secret_file:
+    with open(BASE_DIR / 'secret.json','r',encoding='utf-8') as secret_file:
         secret = json.load(secret_file)
 except FileNotFoundError:
     sys.stderr.write("Fill the secret json file with real values before run, use the sample")
