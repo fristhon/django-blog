@@ -20,7 +20,7 @@ try:
     with open(BASE_DIR / 'secret.json','r',encoding='utf-8') as secret_file:
         secret = json.load(secret_file)
 except FileNotFoundError:
-    sys.stderr.write("Fill the secret json file with real values before run, use the sample")
+    sys.stderr.write("\n!!!Error : Fill the secret json file with real values before run, use the sample\n")
     sys.exit(1)
     
 SECRET_KEY = secret['SECRET_KEY']
